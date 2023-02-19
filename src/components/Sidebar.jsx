@@ -12,7 +12,7 @@ export default function Sidebar() {
             <p>Hey , User</p>
             <nav className="links">
               <ul>
-                <NavLink exact to='/'>
+                <NavLink to='/'>
                   <img src={DashboardIcon} alt="dashboard" />
                   <span>Dashboard</span>
                 </NavLink>

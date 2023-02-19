@@ -1,5 +1,6 @@
+import { ref, uploadBytes } from "firebase/storage";
 import { useState, useEffect } from "react";
-import { auth } from "../firebase/config";
+import { auth, storage } from "../firebase/config";
 import { useAuthContext } from "./useAuthContext";
 
 export const useSignup = () => {
@@ -8,7 +9,7 @@ export const useSignup = () => {
   const [isPending, setIsPending] = useState(false);
   const { dispatch } = useAuthContext();
 
-  const signup = async (email, password, displayName) => {
+  const signup = async (email, password, displayName, thumbnail) => {
     setError(null);
     setIsPending(true);
 
@@ -20,8 +21,16 @@ export const useSignup = () => {
         throw new Error("Could not complete signup");
       }
 
+      const imgRef = ref(storage, `images/${thumbnail.name}`);
+      uploadBytes(imgRef, thumbnail)
+        .then(() => {
+          console.log("image uploaded");
+        })
+        .catch((err) => {
+          console.log("something went wrong");
+        });
       // add display name to user
-      await res.user.updateProfile({ displayName });
+      await res.user.updateProfile({ displayName, photoURL: imgRef });
 
       // dispatch login action
       dispatch({ type: "LOGIN", payload: res.user });
