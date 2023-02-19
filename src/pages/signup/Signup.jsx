@@ -8,10 +8,10 @@ export default function Signup() {
   const [displayName, setDisplayName] = useState('')
   const [thumbnial, setThumbnail] = useState('')
   const [thumbnialError, setThumbnailError] = useState(null)
-  const {signup, isPending, error} = useSignup(); 
+  const { error, isPending, signUp} = useSignup(); 
   const handleSubmit = (e)=>{
     e.preventDefault();
-    signup(email,password,displayName, thumbnial)
+    signUp(email,password,displayName,thumbnial)
 
   }
   const handlefileChange = (e)=>{
@@ -53,7 +53,7 @@ export default function Signup() {
         />
       </label> 
       <label>
-        <span>Password:</span>
+        <span>Full Name:</span>
         <input
         type='text'
         required
@@ -69,10 +69,10 @@ export default function Signup() {
         required
         />
         {thumbnialError && <div className='error'>{thumbnialError}</div>}
-      </label>{!isPending &&
-      <button className='btn'>Create Account</button>}
-      {error && <div className='error'>{error}</div>}
-      {isPending && <button disabled className='btn'>Loading...</button> }
+      </label>
+      {!isPending && <button className='btn'>Sign Up</button>}
+    {error && <p className='error'>{error}</p>}
+    {isPending && <button className='btn'>Loading...</button>}
     </form>
   )
 }
