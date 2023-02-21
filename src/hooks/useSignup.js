@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, storage } from "../firebase/config";
 import { useAuthContext } from "./useAuthContext";
-import { ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 export const useSignup = () => {
   const [error, setError] = useState(null);
@@ -24,15 +24,43 @@ export const useSignup = () => {
         uploadBytes(imgRef, thumbnail)
           .then(() => {
             console.log("image uploaded");
-            updateProfile(auth.currentUser, {
-              displayName,
-              photoURL: imgRef,
-            })
-              .then(() => console.log("updated"))
-              .catch((err) => console.log(err.message));
           })
           .catch((err) => {
             console.log("something went wrong");
+          });
+        getDownloadURL(imgRef)
+          .then((url) => {
+            updateProfile(auth.currentUser, {
+              displayName,
+              photoURL: url,
+            })
+              .then(() => console.log("successfully updated"))
+              .catch((err) => console.log("not updated"));
+          })
+          .catch((err) => {
+            // eslint-disable-next-line default-case
+            switch (err.code) {
+              case "storage/object-not-found":
+                // File doesn't exist
+                break;
+              case "storage/unauthorized":
+                // User doesn't have permission to access the object
+                console.log("unauthorized storage");
+                break;
+              case "storage/canceled":
+                // User canceled the upload
+                console.log("cancelled");
+                break;
+
+              // ...
+
+              case "storage/unknown":
+                // Unknown error occurred, inspect the server response
+                console.log("unkown error occured");
+                break;
+              default:
+                console.log("wow amazing error ");
+            }
           });
 
         //dispatch user login
